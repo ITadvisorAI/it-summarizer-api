@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  title: Summarizer GPT API
+  version: 1.0.0
+  description: |
+    This API receives final deliverables from the IT Financials GPT
+    and packages, emails, and manages the session lifecycle for the transformation reports.
+
+servers:
+  - url: https://it-summarizer-api.onrender.com
+
+paths:
+  /start_summarizer:
+    post:
+      summary: Start final packaging and delivery
+      operationId: startSummarizer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - session_id
+                - email
+                - files
+              properties:
+                session_id:
+                  type: string
+                  description: Session ID used for tracking and folder mapping
+                email:
+                  type: string
+                  description: Email to send the final ZIP archive to
+                gpt_module:
+                  type: string
+                  enum: [summarizer]
+                  description: The GPT module identifier
+                status:
+                  type: string
+                  enum: [complete]
+                  description: Status should be marked complete to initiate final handling
+                files:
+                  type: array
+                  description: All final files to be zipped and emailed
+                  items:
+                    type: object
+                    required:
+                      - file_name
+                      - file_url
+                      - file_type
+                    properties:
+                      file_name:
+                        type: string
+                        description: Name of the final report file
+                      file_url:
+                        type: string
+                        description: Public link to download the file
+                      file_type:
+                        type: string
+                        description: Classification (e.g., docx_strategy, pptx_gap, xlsx_financial)
+      responses:
+        "200":
+          description: Summarizer launched successfully
+        "400":
+          description: Missing required input fields
+        "500":
+          description: Internal processing failure during packaging
