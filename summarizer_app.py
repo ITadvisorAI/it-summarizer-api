@@ -63,6 +63,17 @@ def start_summarizer():
         logging.exception("🔥 Summarizer processing failed")
         return jsonify({"error": str(e)}), 500
 
+    next_webhook = data.get("next_action_webhook")
+    if next_webhook:
+        try:
+            requests.post(
+                next_webhook,
+                json={"message": message, "zip_url": zip_url, "folder_deleted": True},
+                timeout=10
+            )
+        except Exception:
+            logging.exception("Failed to call back into GPT1")
+
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "16000"))
